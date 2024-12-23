@@ -13,18 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create temporary directory
-        run: |
-          mkdir temp_dir
-          cp -r * temp_dir/ 2>/dev/null || true  # Copy all files, ignore errors for special files
-          cp -r .* temp_dir/ 2>/dev/null || true  # Copy hidden files, ignore errors
-
       - name: Create zip file
-        working-directory: temp_dir
-        run: zip -r ../repository-contents.zip .
+        run: |
+          # Move to parent directory
+          cd ..
+          # Zip the contents of the repo directory, but not the directory itself
+          zip -r repository-contents.zip ${GITHUB_WORKSPACE#/github/workspace/}/* ${GITHUB_WORKSPACE#/github/workspace/}/.* -x "*.git*"
+          # Move zip back to workspace
+          mv repository-contents.zip $GITHUB_WORKSPACE/
 
       - name: Upload zip as artifact
         uses: actions/upload-artifact@v4
         with:
           name: repository-contents
-          path: repository-contents.zip
+          path: repository-contents.zipp
