@@ -8,17 +8,23 @@ on:
 jobs:
   zip-repository:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create ZIP File
+      - name: Create temporary directory
         run: |
-          cd .. && zip -r repository.zip $(basename $GITHUB_WORKSPACE) -x '$(basename $GITHUB_WORKSPACE)/.git*' && mv repository.zip $GITHUB_WORKSPACE/
+          mkdir temp_dir
+          cp -r * temp_dir/ 2>/dev/null || true  # Copy all files, ignore errors for special files
+          cp -r .* temp_dir/ 2>/dev/null || true  # Copy hidden files, ignore errors
 
-      - name: Upload Artifact
+      - name: Create zip file
+        working-directory: temp_dir
+        run: zip -r ../repository-contents.zip .
+
+      - name: Upload zip as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: repository-zip
-          path: repository.zip
+          name: repository-contents
+          path: repository-contents.zip
