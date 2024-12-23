@@ -1,0 +1,24 @@
+name: Create ZIP File
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  zip-repository:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create ZIP File
+        run: |
+          mkdir temp && cp -r . temp/ && cd temp && zip -r ../test-action-demo.zip * && cd .. && rm -rf temp
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-action-demo
+          path: test-action-demo.zip
