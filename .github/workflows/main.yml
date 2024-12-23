@@ -15,15 +15,27 @@ jobs:
 
       - name: Create zip file
         run: |
-          # Move to parent directory
-          cd ..
-          # Zip the contents of the repo directory, but not the directory itself
-          zip -r repository-contents.zip ${GITHUB_WORKSPACE#/github/workspace/}/* ${GITHUB_WORKSPACE#/github/workspace/}/.* -x "*.git*"
-          # Move zip back to workspace
-          mv repository-contents.zip $GITHUB_WORKSPACE/
+          # Create a temporary directory
+          mkdir ../temp_dir
+          
+          # Move all repository contents to temp directory
+          mv * ../temp_dir/ 2>/dev/null || true
 
+          
+          # Go to temp directory
+          cd ../temp_dir
+          
+          # Create zip file (from inside temp directory)
+          zip -r ../repository-contents.zip . -x ".git/*" 
+          
+          # Move zip back to workspace
+          mv ../repository-contents.zip $GITHUB_WORKSPACE/
+
+      - name: List files for verification
+        run: ls -la
+          
       - name: Upload zip as artifact
         uses: actions/upload-artifact@v4
         with:
           name: repository-contents
-          path: repository-contents.zipp
+          path: repository-contents.zip
