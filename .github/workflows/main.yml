@@ -13,29 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create zip file
-        run: |
-          # Create a temporary directory
-          mkdir ../temp_dir
-          
-          # Move all repository contents to temp directory
-          mv * ../temp_dir/ 2>/dev/null || true
-
-          
-          # Go to temp directory
-          cd ../temp_dir
-          
-          # Create zip file (from inside temp directory)
-          zip -r ../repository-contents.zip . -x ".git/*" 
-          
-          # Move zip back to workspace
-          mv ../repository-contents.zip $GITHUB_WORKSPACE/
-
-      - name: List files for verification
-        run: ls -la
-          
-      - name: Upload zip as artifact
+      - name: Upload repository contents
         uses: actions/upload-artifact@v4
         with:
           name: repository-contents
-          path: repository-contents.zip
+          path: |
+            *
+            .*
+          exclude: |
+            .git/**
+            .github/**
