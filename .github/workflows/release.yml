@@ -3,17 +3,17 @@ name: Create Release
 on:
   push:
     tags:
-      - 'v*' # Trigger on version tags
+      - "v*" # Trigger on version tags
 
 # Add permissions block at workflow level
 permissions:
   contents: write
   packages: write
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,19 +22,11 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Prepare release directory
-        run: |
-          mkdir release
-          cp -r * release/ || true
-          cp .* release/ 2>/dev/null || true
-          cd release
-          rm -rf .git .github
+      #  create zip file with out repo directory
 
       - name: Create ZIP file
         run: |
-          cd release
-          zip -r ../test-action-demo-v${{ steps.get_version.outputs.VERSION }}.zip ./*
-          cd ..
+          zip -r test-action-demo-v${{ steps.get_version.outputs.VERSION }}.zip . -x "./*" ".git/*" ".github/*" "*.git" ".gitignore"
 
       - name: Create Release
         id: create_release
