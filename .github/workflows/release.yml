@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*' # Trigger on version tags
 
+# Add permissions block at workflow level
+permissions:
+  contents: write
+  packages: write
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,6 +47,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./test-action-dem-v${{ steps.get_version.outputs.VERSION }}.zip
+          asset_path: ./test-action-demo-v${{ steps.get_version.outputs.VERSION }}.zip
           asset_name: test-action-demo-v${{ steps.get_version.outputs.VERSION }}.zip
           asset_content_type: application/zip
