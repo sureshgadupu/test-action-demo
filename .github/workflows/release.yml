@@ -22,13 +22,19 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Remove development files
+      - name: Prepare release directory
         run: |
-          rm -rf .git
-          rm -rf .github
-          
+          mkdir release
+          cp -r * release/ || true
+          cp .* release/ 2>/dev/null || true
+          cd release
+          rm -rf .git .github
+
       - name: Create ZIP file
-        run: zip -r test-action-demo-v${{ steps.get_version.outputs.VERSION }}.zip . -x "*.git*" "*.github*"
+        run: |
+          cd release
+          zip -r ../test-action-demo-v${{ steps.get_version.outputs.VERSION }}.zip ./*
+          cd ..
 
       - name: Create Release
         id: create_release
@@ -38,8 +44,8 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ steps.get_version.outputs.VERSION }}
-          draft: false
-          prerelease: false
+          draft: true
+          prerelease: true
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
